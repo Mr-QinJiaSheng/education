@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.mapper.system.SystemDictValueMapper">
+
+    <insert id="save" parameterType="map" useGeneratedKeys="true" keyProperty="params.id">
+        insert into system_dict_value
+        <foreach collection="params.keys" item="key" open="(" close=")" separator="," >
+            ${key}
+        </foreach>
+        values
+        <foreach collection="params.values"  item="value" open="(" close=")" separator=",">
+            #{value}
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="map">
+        update system_dict_value
+        <foreach collection="params.keys" item="key" open="set" separator="," >
+            ${key} = #{params[${key}]}
+        </foreach>
+        where id = #{params.id}
+    </update>
+
+    <select id="treeList" resultType="map">
+       select value as label, id as value, parent_id from system_dict_value order by sort desc
+    </select>
+
+    <select id="queryList" resultType="map">
+       select a.*, b.value as parent_name from system_dict_value a left join (select id, value from system_dict_value) b
+       on a.parent_id = b.id
+       <where>
+           <if test="system_dict_id != null and system_dict_id != ''">
+               and a.system_dict_id = #{system_dict_id}
+           </if>
+
+           <if test="parentId != null and parentId != ''">
+               and a.parent_id = #{parentId}
+           </if>
+       </where>
+        order by sort desc
+    </select>
+
+    <select id="getDictValueByType" resultType="map">
+        select * from system_dict_value where system_dict_id in (select id from system_dict where type = #{type})
+        <if test="parentId != null and parentId != ''">
+            and parent_id = #{parentId}
+        </if>
+    </select>
+
+    <select id="getDictValueByParentId" resultType="map">
+        select * from system_dict_value where parent_id = #{parentId}
+    </select>
+
+    <delete id="deleteByDictId" parameterType="Integer">
+        delete from system_dict_value where system_dict_id = #{dictId}
+    </delete>
+
+    <delete id="deleteById" parameterType="Integer">
+        delete from system_dict_value where id = #{id}
+    </delete>
+</mapper>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.mapper.system.SystemRoleMenuMapper">
+
+    <!-- 根据角色id  获取菜单列表 -->
+   <select id="getMenuListByRoleIds" resultType="map">
+       select * from system_menu where id in (
+         select menu_id from system_role_menu where role_id in 
+         <foreach collection="roleIds" separator="," close=")" open="(" item="id">
+             #{id}
+         </foreach>
+       )
+   </select>
+
+    <delete id="deleteByRoleId" parameterType="Integer">
+       delete from system_role_menu where role_id = #{roleId}
+    </delete>
+
+    <delete id="deleteByRoleIds" parameterType="list">
+        delete from system_role_menu where role_id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteRoleMenuByRoleId" parameterType="Integer">
+        delete from system_role_menu where role_id = #{roleId}
+    </delete>
+
+    <!-- 批量保存角色与权限的关联关系 -->
+    <insert id="batchSave" parameterType="list">
+        insert into system_role_menu(role_id, menu_id) values
+        <foreach collection="list" separator="," item="item">
+            (#{item.role_id}, #{item.menu_id})
+        </foreach>
+    </insert>
+
+</mapper>

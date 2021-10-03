@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.mapper.education.GradeInfoMapper">
+
+    <insert id="save" parameterType="map" useGeneratedKeys="true" keyProperty="id">
+        insert into grade_info
+        <foreach collection="params.keys" item="key" open="(" close=")" separator="," >
+            ${key}
+        </foreach>
+        values
+        <foreach collection="params.values"  item="value" open="(" close=")" separator=",">
+            #{value}
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="map">
+        update grade_info
+        <foreach collection="params.keys" item="key" open="set" separator="," >
+            ${key} = #{params[${key}]}
+        </foreach>
+        where id = #{params.id}
+    </update>
+
+    <select id="queryList" resultType="map">
+        select * from grade_info
+        <where>
+            <if test="schoolType != null and schoolType != ''">
+                and school_type = #{schoolType}
+            </if>
+        </where>
+    </select>
+</mapper>

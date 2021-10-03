@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.mapper.system.SystemAdminMapper">
+
+    <select id="findByLoginName" resultType="map">
+        select * from system_admin where login_name = #{loginName}
+    </select>
+
+    <select id="queryList" resultType="map">
+        select * from system_admin
+        <where>
+            <if test="keyWord != null and keyWord != ''">
+               <bind name="value" value="'%' + keyWord + '%'"/>
+                and (login_name like #{value} or name like #{value})
+            </if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="map" useGeneratedKeys="true" keyProperty="id">
+        insert into system_admin
+        <foreach collection="params.keys" item="key" open="(" close=")" separator="," >
+            ${key}
+        </foreach>
+        values
+        <foreach collection="params.values"  item="value" open="(" close=")" separator=",">
+            #{value}
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="map">
+        update system_admin
+        <foreach collection="params.keys" item="key" open="set" separator="," >
+            ${key} = #{params[${key}]}
+        </foreach>
+        where id = #{params.id}
+    </update>
+
+    <delete id="deleteById" parameterType="Integer">
+        delete from system_admin where id = #{id}
+    </delete>
+</mapper>

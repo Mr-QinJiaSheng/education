@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.mapper.education.SubjectInfoMapper">
+
+    <select id="queryList" resultType="map">
+        select * from subject_info
+        <where>
+            <!-- 所属阶段 -->
+            <if test="schoolType != null and schoolType != ''">
+                and school_type = ${schoolType}
+            </if>
+            <!-- 年级 -->
+            <if test="gradeType != null and gradeType != ''">
+                and grade_type = ${gradeType}
+            </if>
+
+            <!-- 科目名称 -->
+            <if test="keyWord != null and keyWord != ''">
+                <bind name="searchName" value="'%' + keyWord + '%'"/>
+                and name like #{searchName}
+            </if>
+        </where>
+        order by id desc
+    </select>
+
+</mapper>

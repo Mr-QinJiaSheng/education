@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.mapper.education.CourseMapper">
+
+    <insert id="save" parameterType="map" useGeneratedKeys="true" keyProperty="id">
+        insert into course_info
+        <foreach collection="params.keys" item="key" open="(" close=")" separator="," >
+            ${key}
+        </foreach>
+        values
+        <foreach collection="params.values"  item="value" open="(" close=")" separator=",">
+            #{value}
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="map">
+        update course_info
+        <foreach collection="params.keys" item="key" open="set" separator="," >
+            ${key} = #{params[${key}]}
+        </foreach>
+        where id = #{params.id}
+    </update>
+
+    <select id="queryList" resultType="map">
+       select course.*, grade.name grade_name, subject.name subject_name
+       from course_info course left join grade_info grade on course.grade_type = grade.id
+       left join subject_info subject on course.subject_id = subject.id
+       <where>
+           <if test="keyWord != null and keyWord != ''">
+               <bind name="value" value="'%' + keyWord + '%'"/>
+               and course.name like #{value}
+           </if>
+
+           <!-- 年级条件查询 -->
+           <if test="gradeType != null and gradeType != ''">
+               and course.grade_type = #{gradeType}
+           </if>
+       </where>
+       order by  course.sort desc
+    </select>
+
+    <delete id="deleteById" parameterType="Integer">
+        delete from course_info where id = #{id}
+    </delete>
+</mapper>
